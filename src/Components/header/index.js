@@ -1,48 +1,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState } from "react"
-import { Tezos, wallet, CLOUDFLARE, query_creations } from "./constant"
+import { BeaconWallet } from "@taquito/beacon-wallet"
+import { TezosToolkit } from "@taquito/taquito"
 
 const axios = require("axios")
+
+const Tezos = new TezosToolkit("https://mainnet.smartpy.io")
+
+const wallet = new BeaconWallet({
+  name: "Santi",
+  preferredNetwork: "mainnet",
+})
 
 export const Header = ({ setImg }) => {
   const [walletInfo, setwalletInfo] = useState({})
   const [user, setuser] = useState({})
-
-  const fetchCreationsGraphQL = async (
-    operationsDoc,
-    operationName,
-    variables
-  ) => {
-    const result = await fetch("https://api.hicdex.com/v1/graphql", {
-      method: "POST",
-      body: JSON.stringify({
-        query: operationsDoc,
-        variables: variables,
-        operationName: operationName,
-      }),
-    })
-    return await result.json()
-  }
-
-  const fetchCreations = async () => {
-    const { errors, data } = await fetchCreationsGraphQL(
-      query_creations,
-      "creatorGallery",
-      { address: "tz1ZqRFCTgEt2n1bYPJfKwSiRGD6a1AEDQMs" }
-    )
-    if (errors) {
-      console.error(errors)
-    }
-    const result = data.hic_et_nunc_token
-    let url = data.hic_et_nunc_token[0].artifact_uri
-    var i = url.lastIndexOf("/")
-    url = CLOUDFLARE + url.substring(i + 1, url.length)
-    const formatData = data.hic_et_nunc_token.map((e) => {
-      return { url, description: e.description }
-    })
-    setImg(formatData)
-    return result
-  }
 
   const conect = async () => {
     const network = {
@@ -108,9 +80,6 @@ export const Header = ({ setImg }) => {
         </button>
         <button onClick={disconnect}>
           <p>Disconect</p>
-        </button>
-        <button onClick={fetchCreations}>
-          <p>Get info User</p>
         </button>
         <button onClick={getBalance}>
           <p>Get Balance</p>
